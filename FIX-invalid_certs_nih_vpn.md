@@ -39,7 +39,7 @@ Could not fetch URL https://pypi.org/simple/pip/: There was a problem confirming
 
 3. For any pip/conda install commands, I use the --cert flag. For example - `pip install --cert ~/NIH-DPKI-ROOT-1A.pem dcm2bids`
 
-## "permanent"-ish fix
+### "permanent"-ish fix
 
 Adding the following line in my zshrc file saves me the trouble of specifying the `--cert` flag but that said I'm not sure what's causing the issue to begin with. 
 
