@@ -15,6 +15,7 @@ def parse_arguments():
 def run_shell_cmd(cmdstr):
   pipe = subprocess.Popen(cmdstr, bufsize=1, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                             universal_newlines=True, encoding='utf8', shell=True)
+  return pipe.stdout
     
 def main():
   return None
