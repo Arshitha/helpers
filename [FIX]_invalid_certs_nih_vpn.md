@@ -50,6 +50,7 @@ export REQUESTS_CA_BUNDLE=/Users/arshithab/NIH-DPKI-ROOT-1A.pem
 
 ## References
 * [pip install fails with "connection error: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed (_ssl.c:598)"](https://stackoverflow.com/a/26062583/4393932)
+* https://stackoverflow.com/questions/25981703/pip-install-fails-with-connection-error-ssl-certificate-verify-failed-certi
 * [Conda update fails with SSL error CERTIFICATE_VERIFY_FAILED](https://stackoverflow.com/a/35804869)
 * [Conda User guide on Non-standard certificates](https://docs.conda.io/projects/conda/en/latest/user-guide/configuration/non-standard-certs.html)
 * For DSST folks, here's our [slack discussion thread](https://nimh-dsst.slack.com/archives/CNH809210/p1649081358561459) on the issue
