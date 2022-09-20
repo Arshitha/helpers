@@ -47,6 +47,11 @@ Adding the following line in my zshrc file saves me the trouble of specifying th
 export REQUESTS_CA_BUNDLE=/Users/arshithab/NIH-DPKI-ROOT-1A.pem
 ```
 
+### Update [09/20/2022]
+The above solutions didn't work while trying to install pycap over vpn (off campus). Here's the command that worked today: 
+```bash
+pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org pycap
+```
 
 ## References
 * [pip install fails with "connection error: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed (_ssl.c:598)"](https://stackoverflow.com/a/26062583/4393932)
