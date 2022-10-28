@@ -1,26 +1,39 @@
+#!/usr/local/bin/python3
+"""
+Add program description here.
+"""
 import argparse
 import subprocess
 from pathlib import Path
 
 
-def parse_arguments():
-  parser = argparse.ArgumentParser(description="Does something worth doing.")
+def get_args():
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description=__doc__)
 
-  parser.add_argument("--input_dir", type=Path, action='store', dest='inputdir', help="Path to input directory.")
-  parser.add_argument("--output_dir", type=Path, action='store', dest='outdir', help="Path to output directory.")
-  
-  return parser.parse_args()
-  
-  
-def run_shell_cmd(cmdstr):
-  pipe = subprocess.Popen(cmdstr, bufsize=1, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                            universal_newlines=True, encoding='utf8', shell=True)
-  return pipe.stdout
-    
+    parser.add_argument('-i', '--input', type=Path, action='store', dest='inputdir', metavar='INPUT_DIR',
+                        help='Path to input BIDS directory.')
+    parser.add_argument('-o', '--output', type=Path, action='store', dest='outdir', metavar='OUTPUT_DIR',
+                        default=Path('.'), help="Path to directory that'll contain the outputs.")
+    args = parser.parse_args()
+
+    return args.inputdir.resolve(), args.outdir.resolve()
+
+
+def run(cmdstr, logfile):
+    """Runs the given command str as shell subprocess. If logfile object is provided, then the stdout and stderr of the
+    subprocess is written to the log file.
+    :param str cmdstr: A shell command formatted as a string variable.
+    :param io.TextIOWrapper logfile: optional, File object to log the stdout and stderr of the subprocess.
+    """
+    if not logfile:
+        subprocess.run(cmdstr, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf8', shell=True)
+    else:
+        subprocess.run(cmdstr, stdout=logfile, stderr=subprocess.STDOUT, encoding='utf8', shell=True)
+
+
 def main():
-  return None
+    return None
 
 
-if __name__=="__main__":
-  main()
-  
+if __name__ == "__main__":
+    main()
