@@ -20,7 +20,7 @@ def get_args():
 
 
 def run(cmdstr):
-    p = subprocess.run(cmdstr, stdout=logfile, stderr=subprocess.STDOUT, encoding='utf8', shell=True)
+    p = subprocess.run(cmdstr, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf8', shell=True)
     return p.stdout
 
 
