@@ -5,51 +5,77 @@ Converts CTDB legends (generally) in BIDS valid JSON sidecar files.
 @Authors: Arshitha Basavaraj, Eric Earl
 @Date: 2023-11-04
 """
-import argparse
-import subprocess
-from collections import defaultdict
+# imports
+import json
 from pathlib import Path
 
 import pandas as pd
 
+# file path handling
+LEGENDS = [f for f in Path('.').glob(r'[A-Za-z]*[L,l]egend*.xlsx') if f.is_file()]
+OUTPUT_DIR = Path('reformatted')
+OUTPUT = OUTPUT_DIR.joinpath('participants.json')
 
-def get_args():
-    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description=__doc__)
+# start with a single entry dictionary
+d = {
+    "participant_id": {
+        "LongName": "Participant Identifier",
+        "Description": "Unique BIDS identifier for the participant in this study."
+    }
+}
+for legend in LEGENDS:
+    df = pd.read_excel(legend, sheet_name=0)  # open each legend file and read the first sheet
 
-    parser.add_argument('-i', '--input', type=Path, action='store', dest='input_dir', metavar='INPUT_DIR',
-                        help='Path to input BIDS directory.')
-    parser.add_argument('-o', '--output', type=Path, action='store', dest='output_dir', metavar='OUTPUT_DIR',
-                        help="Path to directory that'll contain the outputs.")
-    args = parser.parse_args()
+    current = ''
+    for i, row in df.iterrows():
+        # detecting if on first line of data dictionary/legend
+        if current == '':
+            # start
+            ShortName = row['QUESTION_NAME']
+            LongName = row['QUESTION_NAME']
+            current = ShortName
 
-    return args
+            if not pd.isna(row['QUESTION_TEXT']):
+                Description = row['QUESTION_TEXT']
+            else:
+                Description = None
 
+            Levels = None
 
-def run(cmdstr):
-    p = subprocess.run(cmdstr, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf8', shell=True)
-    return p.stdout
+        if not pd.isna(row['QUESTION_TEXT']):
+            # write
+            d[ShortName] = {}
+            d[ShortName]['LongName'] = LongName
 
+            if Description:
+                d[ShortName]['Description'] = Description
 
-def main():
-    args = get_args()
-    ffill_cols = ['QUESTION_TEXT', 'QUESTION_NAME', 'QUESTION_ALIAS']
-    dict_of_dfs = pd.read_excel(args.input_dir, sheet_name=None)
-    for sheetname in dict_of_dfs.keys():
-        if "Legend" in sheetname:
-            print(sheetname)
-            df = dict_of_dfs[sheetname]
-            for col in ffill_cols:
-                if col in df.columns:
-                    df[col] = df[col].ffill()
+            if Levels:
+                d[ShortName]['Levels'] = Levels
 
-            d = defaultdict(lambda: defaultdict(dict))
-            d['participant_id']['LongName'] = 'Participant Identifier'
-            d["participant_id"]["Description"] = "Unique BIDS identifier for the participant in this study."
+            # reset
+            ShortName = row['QUESTION_NAME']
+            LongName = row['QUESTION_NAME']
 
-            for idx, row in df.iterrows():
-                if 'QUESTION_ALIAS' in df.columns:
-                    shortname = row['QUESTION_ALIAS']
+            if not pd.isna(row['QUESTION_TEXT']):
+                Description = row['QUESTION_TEXT']
 
+            Levels = None
 
-if __name__ == "__main__":
-    main()
+        if not Levels and not pd.isna(row['CODEVALUE']):
+            Levels = {str(row['CODEVALUE']): str(row['DISPLAY'])}
+        elif Levels and not pd.isna(row['CODEVALUE']):
+            Levels[str(row['CODEVALUE'])] = str(row['DISPLAY'])
+
+        # detecting if on last line of data dictionary/legend
+        if i == df.shape[0] - 1:
+            # write
+            d[ShortName] = {}
+            d[ShortName]['LongName'] = LongName
+            if Description:
+                d[ShortName]['Description'] = Description
+            if Levels:
+                d[ShortName]['Levels'] = Levels
+
+with open(OUTPUT, 'w') as f:
+    f.write(json.dumps(d, indent=4))
