@@ -57,7 +57,7 @@ def main():
     args = get_args()
 
     with open(args.curr_ids_list, 'r') as f:
-        curr_ids = [curr_id.strip() for curr_id in f.readlines()]
+        curr_ids = [curr_id.split('-')[1].strip() for curr_id in f.readlines() if curr_id.startswith('sub-')]
 
     # verifies if there are any duplicate openneuro_ids in the current id_linking_file
     curr_to_new_mapping = dict()
