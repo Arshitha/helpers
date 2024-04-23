@@ -18,7 +18,7 @@ import pandas as pd
 def get_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description=__doc__)
 
-    parser.add_argument('-c', '--current-ids-list', type=Path, action='store', dest='curr_ids_list',
+    parser.add_argument('current-ids-list', type=Path, action='store', dest='curr_ids_list',
                         metavar='CURR_IDS_LIST',
                         help='Path to file with a list of current identifiers with one identifier per line.')
     parser.add_argument('-o', '--output-dir', type=Path, action='store', dest='output_dir', metavar='OUTPUT_DIR',
@@ -57,7 +57,8 @@ def main():
     args = get_args()
 
     with open(args.curr_ids_list, 'r') as f:
-        curr_ids = [curr_id.split('-')[1].strip() for curr_id in f.readlines() if curr_id.startswith('sub-')]
+        curr_ids = [curr_id.split('-')[1].strip() if curr_id.startswith('sub-') else curr_id.strip() for curr_id in
+                    f.readlines()]
 
     # verifies if there are any duplicate openneuro_ids in the current id_linking_file
     curr_to_new_mapping = dict()
